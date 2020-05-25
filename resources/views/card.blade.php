@@ -13,7 +13,7 @@
 				<header>
 					<span class="avatar"><img src="/images/users/{{ $person->id }}.jpg" alt="" /></span>
 					<h1>{{ $person->name}}</h1>
-					<p>{{ nl2br($person->comments) }}</p>
+					<p>{!! nl2br(e($person->comments)) !!}</p>
 				</header>
 			</section>
 			<footer id="footer">
