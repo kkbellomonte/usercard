@@ -48,16 +48,41 @@ class Card extends Controller
 	/**
 	 * Carries out updating the comments for a person.
 	 */
-	 private static function doAppendComments($id, $comments)
-	 {
-     	 $person = self::lookupPerson($id);
+	 public static function doAppendComments($input)
+	 {	 	 
+      	  // Validate that all the required fields are present.
+      	  $validator = Validator::make(
+      	  	  $input,
+      	  	  array_fill_keys(['password', 'id', 'comments'], ['required']),
+      	  	  ['required' => 'Missing key/value for ":attribute"']
+      	  );
+
+      	  if ( $validator->fails() )
+      	  {
+      	  	  $message = Arr::first($validator->errors()->all());
+
+      	  	  return response($message, 422);   
+      	  }
+      	  
+      	  // Check the authorization secret is correct.
+      	  if ( ! self::passwordOk($input['password']) )
+      	  {
+      	  	return response('Invalid password', 401);  
+      	  }
+      	  
+      	  // Guard that the identifier is numeric.
+      	  if ( ! is_numeric($input['id']) ) {
+      	  	  return response('Invalid id', 422);
+      	  }
+      	  
+     	 $person = self::lookupPerson($input['id']);
      	 
      	 if ( is_null($person) )
      	 {
      	 	return response('No such user (1)', 404);	 
      	 }	 	 
 	 	 
-     	 $person->comments .= PHP_EOL . $comments;
+     	 $person->comments .= PHP_EOL . $input['comments'];
      	 $person->save();
      	 
 	 	 return response('OK', 200);
@@ -93,32 +118,7 @@ class Card extends Controller
       	  }
       	  
       	  $input = empty($request->getContent()) ? $request->all() : $request->json()->all();
-      	  
-      	  // Validate that all the required fields are present.
-      	  $validator = Validator::make(
-      	  	  $input,
-      	  	  array_fill_keys(['password', 'id', 'comments'], ['required']),
-      	  	  ['required' => 'Missing key/value for ":attribute"']
-      	  );
-
-      	  if ( $validator->fails() )
-      	  {
-      	  	  $message = Arr::first($validator->errors()->all());
-
-      	  	  return response($message, 422);   
-      	  }
-      	  
-      	  // Check the authorization secret is correct.
-      	  if ( ! self::passwordOk($input['password']) )
-      	  {
-      	  	return response('Invalid password', 401);  
-      	  }
-      	  
-      	  // Guard that the identifier is numeric.
-      	  if ( ! is_numeric($input['id']) ) {
-      	  	  return response('Invalid id', 422);
-      	  }
-      	  
-      	  return self::doAppendComments($input['id'], $input['comments']);
+      	        	  
+      	  return self::doAppendComments($input);
       }
 }
