@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/user/{id}', 'Card@display');
+
+Route::post('/', 'Card@appendComments');
+
+Route::fallback(function () {
+	return response('No such user (3)', 404);
 });
