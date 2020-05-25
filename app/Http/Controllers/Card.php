@@ -18,7 +18,7 @@ class Card extends Controller
 	 * Person object.
 	 *
 	 */
-	 private static function lookupPerson($id) {
+	 public static function lookupPerson($id) {
 	 	 try {
 	 	 	 return Person::findOrFail($id);
 	 	 }
@@ -30,7 +30,7 @@ class Card extends Controller
 	 /**
 	  * Determines whether a non-empty request body IS NOT proper JSON.
 	  */
-	  private static function badJSONRequest(Request $request) {
+	  public static function badJSONRequest(Request $request) {
 	  	  if ( empty($request->getContent()) ) { return false; }
 	  	  
 	  	  json_decode($request->getContent());
@@ -41,7 +41,7 @@ class Card extends Controller
 	  /**
 	   * Checks the authorization secret.
 	   */
-	   private static function passwordOk($password) {
+	   public static function passwordOk($password) {
 	   		return strtoupper($password) ===  strtoupper(config('parameters.secrets.password'));   
 	   }
 	  
